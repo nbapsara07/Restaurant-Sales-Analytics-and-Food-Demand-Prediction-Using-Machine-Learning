@@ -1,6 +1,6 @@
 
 # RestaurantIQ 🍽️
-## Restaurant Sales Analytics and Food Demand Prediction Using Machine Learning
+## Restaurant Sales Analytics and Food Demand Prediction 
 
 RestaurantIQ is a data analytics and machine learning project designed to analyze restaurant sales data, predict food demand, and support better food preparation planning. The project uses historical restaurant sales data to identify demand patterns, compare machine learning models, and help restaurants make data-driven decisions.
 
@@ -25,9 +25,9 @@ RestaurantIQ is a data analytics and machine learning project designed to analyz
 - **readr** – Reading and processing CSV files
 - **Excel** – Dataset storage and management
 
-## 🤖 Machine Learning Models
+## 🤖 Models
 
-Five machine learning approaches are compared in this project:
+Five approaches are compared in this project:
 
 ### 1. Decision Tree
 Uses a sequence of decision rules to learn patterns in historical sales data and estimate food demand.
