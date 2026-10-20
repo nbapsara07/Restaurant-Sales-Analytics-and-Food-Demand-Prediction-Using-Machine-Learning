@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>RestaurantIQ | Restaurant Analytics</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 24px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #293449;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ffad60;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      margin-left: 24px;
+    }
+
+    .hero {
+      min-height: 75vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 20px;
+      background:
+        radial-gradient(ellipse at top, #293d58 0%, #101827 65%);
+    }
+
+    .tag {
+      color: #ffad60;
+      border: 1px solid #ffad60;
+      border-radius: 30px;
+      padding: 9px 18px;
+      margin-bottom: 26px;
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 68px);
+      margin-bottom: 22px;
+    }
+
+    h1 span {
+      color: #ffad60;
+    }
+
+    .description {
+      max-width: 680px;
+      color: #c2ccda;
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 16px 30px;
+      background: #ffad60;
+      color: #101827;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 9px;
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      background: #ffc18a;
+      transform: translateY(-2px);
+    }
+
+    .features {
+      padding: 40px 8% 70px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      padding: 28px;
+      background: #1a2638;
+      border: 1px solid #2c3a50;
+      border-radius: 14px;
+    }
+
+    .card .icon {
+      font-size: 30px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      color: #c2ccda;
+      line-height: 1.7;
+    }
+
+    footer {
+      padding: 24px;
+      text-align: center;
+      color: #9eacc0;
+      border-top: 1px solid #293449;
+    }
+
+    footer a {
+      color: #ffad60;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">🍽 RestaurantIQ</div>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="https://github.com/nbapsara07/Restaurant-Sales-Analytics-and-Food-Demand-Prediction-Using-Machine-Learning"
+         target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="tag">RESTAURANT ANALYTICS & MACHINE LEARNING</div>
+
+      <h1>Smarter Insights.<br>
+        <span>Better Decisions.</span>
+      </h1>
+
+      <p class="description">
+        Welcome to RestaurantIQ — an interactive analytics platform
+        for exploring restaurant sales, understanding food demand,
+        and supporting data-driven business decisions.
+      </p>
+
+      <a class="button"
+         href="https://webnet.shinyapps.io/restaurantiq/"
+         target="_blank"
+         rel="noopener noreferrer">
+        Launch RestaurantIQ →
+      </a>
+    </section>
+
+    <section class="features" id="features">
+      <div class="card">
+        <div class="icon">📊</div>
+        <h2>Sales Analytics</h2>
+        <p>Explore restaurant sales data and discover useful business trends.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🤖</div>
+        <h2>Demand Prediction</h2>
+        <p>Use machine-learning models to help predict food demand.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📈</div>
+        <h2>Interactive Insights</h2>
+        <p>Explore data-driven insights through interactive visualizations.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>RestaurantIQ | Built with R, Shiny & Machine Learning</p>
+    <p style="margin-top: 10px;">
+      <a href="https://github.com/nbapsara07/Restaurant-Sales-Analytics-and-Food-Demand-Prediction-Using-Machine-Learning"
+         target="_blank" rel="noopener noreferrer">View Source Code on GitHub</a>
+    </p>
+  </footer>
+
+</body>
+</html>
