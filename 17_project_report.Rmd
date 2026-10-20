@@ -1,0 +1,319 @@
+---
+title: "RestaurantIQ: Methodology and Results"
+author: "RestaurantIQ Project Team"
+date: "2026-10-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+# 1. Introduction
+
+RestaurantIQ is a restaurant demand forecasting and analytics project developed using R. It analyzes historical restaurant sales data to identify demand patterns, forecast the quantity of food items likely to be sold, and generate smart food preparation recommendations.
+
+The project aims to support data-driven food preparation, improve demand planning, and help reduce potential food waste.
+
+# 2. Project Objectives
+
+- Analyze historical restaurant sales data.
+- Identify popular food items and demand patterns.
+- Prepare daily demand data for forecasting.
+- Train and compare five regression models.
+- Evaluate models using MAE, RMSE, and R-squared.
+- Generate food preparation recommendations based on predicted demand.
+- Prepare analytical outputs for an interactive Shiny and Plotly dashboard.
+
+# 3. Dataset Description
+
+RestaurantIQ uses three datasets:
+
+- **Sales_Clean:** 111,344 sales records after duplicate removal and data cleaning.
+- **Recipe_Clean:** 1,148 recipe records.
+- **Food_Mapping:** 122 food-to-recipe mapping records.
+
+The sales dataset contains transaction dates, food names, quantities, categories, prices, discounts, and food costs. The sales data covers January 2020 to March 2024.
+
+# 4. Data Preprocessing
+
+The following preprocessing steps were performed:
+
+1. Removed 226 exact duplicate records.
+2. Standardized the order type "Take Out" to "TAKEOUT".
+3. Retained other order types where there was insufficient evidence to classify them as invalid.
+4. Checked for missing values and examined zero-price and negative-price records.
+5. Preserved flagged zero-price and negative-price records rather than automatically deleting them.
+
+Zero-price transactions may represent legitimate discounts or other business cases and require further investigation before being excluded.
+
+# 5. Exploratory Data Analysis
+
+Exploratory Data Analysis (EDA) was performed to understand restaurant sales patterns.
+
+The analysis included:
+
+- Total quantity sold by food item.
+- Monthly demand trends.
+- Demand by food category.
+- Daily total demand.
+- Identification of frequently sold food items.
+
+The results showed that demand varies across food items and time periods. These findings support the use of demand forecasting for preparation planning.
+
+# 6. Daily Demand and Feature Engineering
+
+Daily demand was calculated by grouping sales records by date and food item and summing the quantity sold.
+
+The initial daily demand dataset contained 62,728 observed food-date combinations.
+
+A complete calendar grid was then created for all 122 food items. Missing food-date combinations were assigned a demand of zero, assuming that no recorded sale meant no demand. This assumption should be validated against the source system.
+
+The following features were created:
+
+- Day of the week.
+- Month.
+- Day of the month.
+- Previous-day demand (Lag 1).
+- Demand seven days earlier (Lag 7).
+- Demand 14 days earlier (Lag 14).
+- Demand 28 days earlier (Lag 28).
+- Seven-day rolling mean based on the previous seven days.
+
+After removing rows without sufficient lag history, the modelling dataset contained 185,928 rows.
+
+# 7. Model Development
+
+Five regression models were trained and compared:
+
+1. Linear Regression.
+2. Decision Tree Regression.
+3. Random Forest Regression.
+4. Gradient Boosting Regression.
+5. K-Nearest Neighbors (KNN) Regression.
+
+The data was divided chronologically. The training period ended on May 31, 2023, and the test period began on June 1, 2023.
+
+The test set contained 37,210 observations.
+
+The models used calendar and historical demand features to predict daily quantity sold.
+
+# 8. Evaluation Metrics
+
+Three metrics were used to evaluate the models.
+
+- **Mean Absolute Error (MAE):** Measures the average absolute difference between actual and predicted demand. Lower values are better.
+- **Root Mean Squared Error (RMSE):** Measures prediction error while penalizing large errors more heavily. Lower values are better.
+- **R-squared (R²):** Measures how much variation in the test-set demand is explained by the model relative to a mean prediction baseline. Higher values are generally better.
+
+# 9. Model Comparison
+
+The following table presents the performance of the five forecasting models.
+
+```{r model-comparison}
+comparison <- read.csv("shared_outputs/Model_Comparison.csv")
+
+knitr::kable(
+  comparison,
+  digits = 4,
+  caption = "Performance Comparison of Five Forecasting Models"
+)
+```
+
+## 9.1 MAE Comparison
+
+```{r mae-plot}
+ggplot(comparison, aes(x = reorder(Model, MAE), y = MAE)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Model Comparison by MAE",
+    x = "Model",
+    y = "Mean Absolute Error"
+  ) +
+  theme_minimal()
+```
+
+## 9.2 RMSE Comparison
+
+```{r rmse-plot}
+ggplot(comparison, aes(x = reorder(Model, RMSE), y = RMSE)) +
+  geom_col(fill = "darkorange") +
+  coord_flip() +
+  labs(
+    title = "Model Comparison by RMSE",
+    x = "Model",
+    y = "Root Mean Squared Error"
+  ) +
+  theme_minimal()
+```
+
+## 9.3 R-squared Comparison
+
+```{r r2-plot}
+ggplot(comparison, aes(x = reorder(Model, R2), y = R2)) +
+  geom_col(fill = "seagreen") +
+  coord_flip() +
+  labs(
+    title = "Model Comparison by R-squared",
+    x = "Model",
+    y = "R-squared"
+  ) +
+  theme_minimal()
+```
+
+# 10. Selected Model
+
+Gradient Boosting performed best among the five models evaluated.
+
+Its test-set performance was:
+
+- **MAE:** 0.7059
+- **RMSE:** 1.4725
+- **R-squared:** 0.2603
+
+It achieved the lowest MAE and RMSE and the highest R-squared among the five models.
+
+However, an R-squared of approximately 0.26 indicates that the model explains a limited proportion of the variation in test-set demand. Its predictions should therefore be interpreted cautiously, especially for occasional high-demand events.
+
+# 11. Prediction Validation
+
+The Gradient Boosting model generated 37,210 test predictions.
+
+The validation checks found:
+
+- Zero missing actual values.
+- Zero missing predicted values.
+- Zero negative predicted values.
+- Mean actual demand of approximately 0.6972 units.
+- Mean predicted demand of approximately 0.6915 units.
+
+Although the overall mean prediction was close to the actual mean, the model may underestimate occasional demand spikes.
+
+## 11.1 Actual versus Predicted Demand
+
+```{r validation-scatter}
+validated <- read.csv(
+  "shared_outputs/GradientBoosting_Validated.csv"
+)
+
+ggplot(validated, aes(x = Actual, y = Predicted)) +
+  geom_point(alpha = 0.25) +
+  geom_abline(
+    intercept = 0,
+    slope = 1,
+    color = "red",
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Actual versus Predicted Demand",
+    x = "Actual Quantity Sold",
+    y = "Predicted Quantity"
+  ) +
+  theme_minimal()
+```
+
+## 11.2 Prediction Error Distribution
+
+```{r error-distribution}
+ggplot(validated, aes(x = Error)) +
+  geom_histogram(
+    bins = 30,
+    fill = "steelblue",
+    color = "white"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    color = "red",
+    linetype = "dashed"
+  ) +
+  labs(
+    title = "Distribution of Prediction Errors",
+    x = "Actual Demand - Predicted Demand",
+    y = "Number of Predictions"
+  ) +
+  theme_minimal()
+```
+
+# 12. Smart Food Preparation Recommendations
+
+A preliminary preparation recommendation was generated using Gradient Boosting predictions and a 15% safety buffer.
+
+The preparation quantity was calculated as:
+
+Recommended Preparation = ceiling(Predicted Demand × 1.15)
+
+The ceiling function rounds the result up to the next whole unit.
+
+This approach provides an initial demand-based preparation estimate. It does not yet account for current inventory, ingredient availability, shelf life, preparation capacity, or the cost of overproduction.
+
+The recommendations should therefore be treated as decision-support estimates rather than guaranteed optimal preparation quantities.
+
+## 12.1 Top Food Items by Recommended Preparation
+
+```{r preparation-summary}
+preparation <- read.csv(
+  "shared_outputs/Food_Preparation_Summary.csv"
+)
+
+knitr::kable(
+  head(preparation, 10),
+  digits = 2,
+  caption = "Top 10 Food Items by Recommended Preparation"
+)
+```
+
+## 12.2 Preparation Recommendation Chart
+
+```{r preparation-chart}
+top_foods <- head(preparation, 10)
+
+ggplot(
+  top_foods,
+  aes(
+    x = reorder(Food_Name, Total_Recommended_Preparation),
+    y = Total_Recommended_Preparation
+  )
+) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Foods by Recommended Preparation",
+    x = "Food Item",
+    y = "Total Recommended Units"
+  ) +
+  theme_minimal()
+```
+
+# 13. Limitations
+
+The project has several limitations:
+
+1. Missing food-date combinations were treated as zero demand. This may not always reflect actual demand.
+2. The dataset contains many zero-demand observations, resulting in a sparse demand distribution.
+3. Gradient Boosting may underestimate occasional high-demand spikes.
+4. Recipe mapping is incomplete, so ingredient-level recommendations cannot yet be generated reliably for every food item.
+5. Current inventory, ingredient availability, preparation capacity, and shelf life are not included in the recommendations.
+6. The test evaluation uses a rolling one-step-ahead setup in which actual preceding demand values are available for lag features. This is not the same as a fully recursive multi-day forecast.
+
+# 14. Future Enhancements
+
+Future improvements include:
+
+- Integrating forecasts into a Shiny and Plotly dashboard.
+- Displaying demand trends and model performance interactively.
+- Incorporating current inventory and recipe information.
+- Improving predictions for intermittent demand and demand spikes.
+- Comparing performance against additional baseline forecasting methods.
+- Generating ingredient-level preparation estimates where recipe mappings are available.
+
+# 15. Conclusion
+
+RestaurantIQ demonstrates how restaurant sales data can be transformed into demand forecasts and preliminary food preparation recommendations using R.
+
+Five regression models were compared, and Gradient Boosting achieved the best overall metrics in the current evaluation. The resulting predictions, evaluation graphs, and recommendation files provide a foundation for an interactive dashboard.
+
+Although the results show potential for decision support, further validation and integration of inventory and recipe information are needed before using the recommendations for operational decisions.
